@@ -19,5 +19,5 @@ java {
 }
 
 application {
-    mainClass.set("io.github.pandier.multisnake.App")
+    mainClass.set("io.github.pandier.multisnake.Main")
 }

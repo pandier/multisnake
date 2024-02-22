@@ -1,6 +1,6 @@
 <configuration>
-    <conversionRule conversionWord="brightBlack" converterClass="io.github.pandier.multisnake.logger.color.BrightBlackCompositeConverter" />
-    <conversionRule conversionWord="levelHighlight" converterClass="io.github.pandier.multisnake.logger.color.LevelHighlightingCompositeConverter" />
+    <conversionRule conversionWord="brightBlack" converterClass="io.github.pandier.multisnake.logging.color.BrightBlackCompositeConverter" />
+    <conversionRule conversionWord="levelHighlight" converterClass="io.github.pandier.multisnake.logging.color.LevelHighlightingCompositeConverter" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

@@ -1,4 +1,4 @@
-package io.github.pandier.multisnake.logger.color;
+package io.github.pandier.multisnake.logging.color;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;

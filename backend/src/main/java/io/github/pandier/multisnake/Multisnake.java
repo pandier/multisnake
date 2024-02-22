@@ -17,7 +17,7 @@ public class Multisnake {
      */
     public Multisnake() throws Exception {
         try {
-            this.server = MultisnakeServer.open(new InetSocketAddress(25566));
+            this.server = MultisnakeServer.open(new InetSocketAddress(35236));
         } catch (NetworkingException e) {
             throw new Exception("Failed to open server", e);
         }

@@ -18,42 +18,24 @@ import static java.util.Objects.requireNonNull;
 public class MultisnakeServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultisnakeServer.class);
 
-    private final InetSocketAddress address;
     private final ServerSocketChannel channel;
     private final Selector selector;
 
-    private MultisnakeServer(InetSocketAddress address, ServerSocketChannel channel, Selector selector) {
-        this.address = address;
+    private MultisnakeServer(ServerSocketChannel channel, Selector selector) {
         this.channel = channel;
         this.selector = selector;
     }
 
     /**
-     * Opens a multisnake server and binds it at a specific {@link InetSocketAddress} address.
+     * Opens a server-socket channel and a selector for a multisnake server.
      *
-     * @param address the address to bind to
-     * @return the opened multisnake server
+     * @return the multisnake server
      */
-    public static @NotNull MultisnakeServer open(@NotNull InetSocketAddress address) throws NetworkingException {
-        requireNonNull(address, "Address cannot be null");
-
+    public static @NotNull MultisnakeServer open() throws NetworkingException {
         ServerSocketChannel socket = NetworkingException.wrap(ServerSocketChannel::open, "Failed to open server socket channel");
         Selector selector = NetworkingException.wrap(Selector::open, "Failed to open selector");
 
-        try {
-            socket.bind(address);
-        } catch (IOException e) {
-            throw new NetworkingException("Failed to bind address", e);
-        }
-
-        try {
-            socket.configureBlocking(false);
-            socket.register(selector, SelectionKey.OP_ACCEPT);
-        } catch (IOException e) {
-            throw new NetworkingException("Failed to configure socket", e);
-        }
-
-        return new MultisnakeServer(address, socket, selector);
+        return new MultisnakeServer(socket, selector);
     }
 
     /**
@@ -64,7 +46,22 @@ public class MultisnakeServer {
      *
      * @throws NetworkingException if an error happens
      */
-    public void start() throws NetworkingException {
+    public void start(@NotNull InetSocketAddress address) throws NetworkingException {
+        requireNonNull(address, "Address cannot be null");
+
+        try {
+            channel.bind(address);
+        } catch (IOException e) {
+            throw new NetworkingException("Failed to bind address", e);
+        }
+
+        try {
+            channel.configureBlocking(false);
+            channel.register(selector, SelectionKey.OP_ACCEPT);
+        } catch (IOException e) {
+            throw new NetworkingException("Failed to configure socket", e);
+        }
+
         try (selector; channel) {
             LOGGER.info("Accepting connections on {}:{}", address.getAddress().getHostAddress(), address.getPort());
 
@@ -106,15 +103,6 @@ public class MultisnakeServer {
                 return;
             // TODO: Read from the channel
         }
-    }
-
-    /**
-     * Returns the {@link InetSocketAddress} of this server.
-     *
-     * @return the address
-     */
-    public InetSocketAddress getAddress() {
-        return address;
     }
 
     /**

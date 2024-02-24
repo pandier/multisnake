@@ -1,5 +1,7 @@
 package io.github.pandier.multisnake.network;
 
+import io.github.pandier.multisnake.network.connection.ClientConnection;
+import io.github.pandier.multisnake.network.connection.ClientConnectionHandler;
 import io.github.pandier.multisnake.network.packet.PacketHandler;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ public class MultisnakeServer {
     private final Selector selector;
 
     private final PacketHandler packetHandler;
+    private final ClientConnectionHandler clientConnectionHandler;
 
     private final ByteBuffer inputBuffer;
 
@@ -32,6 +35,7 @@ public class MultisnakeServer {
         this.selector = selector;
 
         this.packetHandler = new PacketHandler();
+        this.clientConnectionHandler = new ClientConnectionHandler(this);
 
         this.inputBuffer = ByteBuffer.allocate(256);
     }
@@ -100,10 +104,13 @@ public class MultisnakeServer {
                         LOGGER.warn("Ignoring acceptable selection key, because no connection can be accepted");
                         return;
                     }
+
                     clientChannel.configureBlocking(false);
                     clientChannel.register(selector, SelectionKey.OP_READ);
 
-                    LOGGER.info("Accepted new connection from {}", clientChannel.getRemoteAddress());
+                    ClientConnection clientConnection = clientConnectionHandler.create(clientChannel);
+
+                    LOGGER.info("Accepted new connection from {} as {}", clientChannel.getRemoteAddress(), clientConnection.getUuid());
                 } catch (IOException e) {
                     LOGGER.error("Failed to accept socket", e);
                 }
@@ -111,18 +118,36 @@ public class MultisnakeServer {
         } else if (key.isReadable()) {
             if (!(key.channel() instanceof SocketChannel clientChannel))
                 return;
+
+            ClientConnection clientConnection = clientConnectionHandler.get(clientChannel);
+            if (clientConnection == null) {
+                try {
+                    LOGGER.warn("Client {} does not have an assigned connection instance, closing the connection", clientChannel.getRemoteAddress());
+                    clientChannel.close();
+                    return;
+                } catch (IOException e) {
+                    throw new NetworkingException("Failed to close a socket channel", e);
+                }
+            }
+
             try {
                 inputBuffer.clear();
-                if (clientChannel.read(inputBuffer) <= 0)
+
+                int i = clientChannel.read(inputBuffer);
+                if (i == 0) {
                     return;
-                inputBuffer.flip();
-                packetHandler.process(clientChannel, inputBuffer);
-            } catch (IOException | NetworkingException e) {
-                try {
-                    LOGGER.error("Failed to process packet received from client {}", clientChannel.getRemoteAddress(), e);
-                } catch (IOException ex) {
-                    throw new NetworkingException("Failed to get remote address of client", ex);
+                } else if (i < 0) {
+                    clientConnectionHandler.remove(clientChannel);
+                    clientChannel.close();
+                    key.cancel();
+                    LOGGER.info("Closed connection with client {}", clientConnection.getUuid());
+                    return;
                 }
+
+                inputBuffer.flip();
+                packetHandler.process(clientConnection, inputBuffer);
+            } catch (IOException | NetworkingException e) {
+                LOGGER.error("Failed to process packet received from client {}", clientConnection.getUuid(), e);
             }
         }
     }
@@ -134,6 +159,15 @@ public class MultisnakeServer {
      */
     public @NotNull PacketHandler getPacketHandler() {
         return packetHandler;
+    }
+
+    /**
+     * Returns the {@link ClientConnectionHandler} of this server.
+     *
+     * @return the client connection handler
+     */
+    public ClientConnectionHandler getClientConnectionHandler() {
+        return clientConnectionHandler;
     }
 
     /**

@@ -1,6 +1,7 @@
 package io.github.pandier.multisnake.network.packet;
 
 import io.github.pandier.multisnake.network.NetworkingException;
+import io.github.pandier.multisnake.network.connection.ClientConnection;
 import io.github.pandier.multisnake.network.packet.client.ClientPacket;
 import io.github.pandier.multisnake.network.packet.client.ClientPacketFactory;
 import io.github.pandier.multisnake.network.packet.server.ServerPacket;
@@ -84,28 +85,20 @@ public class PacketHandler {
      * the packet is ignored. Then a {@link ClientPacket} is constructed
      * using the packet factory. The packet is then processed by its needs.
      *
-     * @param clientChannel the sender of the packet
-     * @param buffer        the packet data
+     * @param clientConnection the sender of the packet
+     * @param buffer           the packet data
      * @throws NetworkingException if an error occurs
      */
-    public void process(@NotNull SocketChannel clientChannel, @NotNull ByteBuffer buffer) throws NetworkingException {
+    public void process(@NotNull ClientConnection clientConnection, @NotNull ByteBuffer buffer) throws NetworkingException {
         byte identifier = buffer.get();
         ClientPacketFactory<?> factory = getClientPacketFactory(identifier);
         if (factory == null) {
-            try {
-                LOGGER.info("Received invalid packet identifier '{}' from client {}", identifier, clientChannel.getRemoteAddress());
-            } catch (IOException e) {
-                throw new NetworkingException("Failed to get remote address of client", e);
-            }
+            LOGGER.info("Received invalid packet identifier '{}' from client {}", identifier, clientConnection.getUuid());
             return;
         }
 
         ClientPacket packet = factory.read(buffer);
-        try {
-            LOGGER.debug("Received packet with identifier '{}' from client {}", identifier, clientChannel.getRemoteAddress());
-        } catch (IOException e) {
-            throw new NetworkingException("Failed to get remote address of client", e);
-        }
+        LOGGER.debug("Received packet with identifier '{}' from client {}", identifier, clientConnection.getUuid());
     }
 
     /**

@@ -23,7 +23,7 @@ public class MultisnakeServer {
     private final ServerSocketChannel channel;
     private final Selector selector;
 
-    private final PacketHandler packetProcessor;
+    private final PacketHandler packetHandler;
 
     private final ByteBuffer inputBuffer;
 
@@ -31,7 +31,7 @@ public class MultisnakeServer {
         this.channel = channel;
         this.selector = selector;
 
-        this.packetProcessor = new PacketHandler();
+        this.packetHandler = new PacketHandler();
 
         this.inputBuffer = ByteBuffer.allocate(256);
     }
@@ -116,7 +116,7 @@ public class MultisnakeServer {
                 if (clientChannel.read(inputBuffer) <= 0)
                     return;
                 inputBuffer.flip();
-                packetProcessor.process(clientChannel, inputBuffer);
+                packetHandler.process(clientChannel, inputBuffer);
             } catch (IOException | NetworkingException e) {
                 try {
                     LOGGER.error("Failed to process packet received from client {}", clientChannel.getRemoteAddress(), e);

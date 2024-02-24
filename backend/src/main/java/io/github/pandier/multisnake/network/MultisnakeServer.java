@@ -123,40 +123,42 @@ public class MultisnakeServer {
                     }
                 }
             }
-        } else if (key.isReadable()) {
-            if (!(key.channel() instanceof SocketChannel clientChannel))
-                return;
+        } else if (key.channel() instanceof SocketChannel clientChannel) {
+            if (key.isReadable()) {
+                ClientConnection clientConnection = clientConnectionHandler.get(clientChannel);
+                if (clientConnection == null) {
+                    try {
+                        LOGGER.warn("Client {} does not have an assigned connection instance, closing the connection", clientChannel.getRemoteAddress());
+                        clientChannel.close();
+                        return;
+                    } catch (IOException e) {
+                        throw new NetworkingException("Failed to close a socket channel", e);
+                    }
+                }
 
-            ClientConnection clientConnection = clientConnectionHandler.get(clientChannel);
-            if (clientConnection == null) {
                 try {
-                    LOGGER.warn("Client {} does not have an assigned connection instance, closing the connection", clientChannel.getRemoteAddress());
-                    clientChannel.close();
-                    return;
-                } catch (IOException e) {
-                    throw new NetworkingException("Failed to close a socket channel", e);
+                    inputBuffer.clear();
+
+                    int i = clientChannel.read(inputBuffer);
+                    if (i == 0) {
+                        return;
+                    } else if (i < 0) {
+                        clientConnectionHandler.remove(clientChannel);
+                        clientChannel.close();
+                        key.cancel();
+                        LOGGER.info("Closed connection with client {}", clientConnection.getUuid());
+                        return;
+                    }
+
+                    inputBuffer.flip();
+                    packetHandler.process(clientConnection, inputBuffer);
+                } catch (IOException | NetworkingException e) {
+                    LOGGER.error("Failed to process packet received from client {}", clientConnection.getUuid(), e);
                 }
             }
-
-            try {
-                inputBuffer.clear();
-
-                int i = clientChannel.read(inputBuffer);
-                if (i == 0) {
-                    return;
-                } else if (i < 0) {
-                    clientConnectionHandler.remove(clientChannel);
-                    clientChannel.close();
-                    key.cancel();
-                    LOGGER.info("Closed connection with client {}", clientConnection.getUuid());
-                    return;
-                }
-
-                inputBuffer.flip();
-                packetHandler.process(clientConnection, inputBuffer);
-            } catch (IOException | NetworkingException e) {
-                LOGGER.error("Failed to process packet received from client {}", clientConnection.getUuid(), e);
-            }
+        } else {
+            // Cancel unwanted selection keys
+            key.cancel();
         }
     }
 

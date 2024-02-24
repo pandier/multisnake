@@ -83,11 +83,11 @@ public class MultisnakeServer {
                 selector.select();
 
                 Set<SelectionKey> keys = selector.selectedKeys();
-                Iterator<SelectionKey> keyIterator = keys.iterator();
+                Iterator<SelectionKey> iterator = keys.iterator();
 
-                while (keyIterator.hasNext()) {
-                    process(keyIterator.next());
-                    keyIterator.remove();
+                while (iterator.hasNext()) {
+                    process(iterator.next());
+                    iterator.remove();
                 }
             }
         } catch (IOException e) {

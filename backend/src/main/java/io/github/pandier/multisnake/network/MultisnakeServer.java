@@ -98,8 +98,9 @@ public class MultisnakeServer {
     private void process(@NotNull SelectionKey key) throws NetworkingException {
         if (key.channel() == channel) {
             if (key.isAcceptable()) {
+                SocketChannel clientChannel = null;
                 try {
-                    SocketChannel clientChannel = channel.accept();
+                    clientChannel = channel.accept();
                     if (clientChannel == null) {
                         LOGGER.warn("Ignoring acceptable selection key, because no connection can be accepted");
                         return;
@@ -113,6 +114,13 @@ public class MultisnakeServer {
                     LOGGER.info("Accepted new connection from {} as {}", clientChannel.getRemoteAddress(), clientConnection.getUuid());
                 } catch (IOException e) {
                     LOGGER.error("Failed to accept socket", e);
+                    if (clientChannel != null) {
+                        try {
+                            clientChannel.close();
+                        } catch (IOException closeException) {
+                            throw new NetworkingException("Failed to close a socket channel", closeException);
+                        }
+                    }
                 }
             }
         } else if (key.isReadable()) {

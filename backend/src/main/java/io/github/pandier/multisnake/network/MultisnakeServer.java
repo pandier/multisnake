@@ -1,11 +1,13 @@
 package io.github.pandier.multisnake.network;
 
+import io.github.pandier.multisnake.network.packet.PacketHandler;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Set;
@@ -21,9 +23,17 @@ public class MultisnakeServer {
     private final ServerSocketChannel channel;
     private final Selector selector;
 
+    private final PacketHandler packetProcessor;
+
+    private final ByteBuffer inputBuffer;
+
     private MultisnakeServer(ServerSocketChannel channel, Selector selector) {
         this.channel = channel;
         this.selector = selector;
+
+        this.packetProcessor = new PacketHandler();
+
+        this.inputBuffer = ByteBuffer.allocate(256);
     }
 
     /**
@@ -81,7 +91,7 @@ public class MultisnakeServer {
         }
     }
 
-    private void process(@NotNull SelectionKey key) {
+    private void process(@NotNull SelectionKey key) throws NetworkingException {
         if (key.channel() == channel) {
             if (key.isAcceptable()) {
                 try {
@@ -101,7 +111,19 @@ public class MultisnakeServer {
         } else if (key.isReadable()) {
             if (!(key.channel() instanceof SocketChannel clientChannel))
                 return;
-            // TODO: Read from the channel
+            try {
+                inputBuffer.clear();
+                if (clientChannel.read(inputBuffer) <= 0)
+                    return;
+                inputBuffer.flip();
+                packetProcessor.process(clientChannel, inputBuffer);
+            } catch (IOException | NetworkingException e) {
+                try {
+                    LOGGER.error("Failed to process packet received from client {}", clientChannel.getRemoteAddress(), e);
+                } catch (IOException ex) {
+                    throw new NetworkingException("Failed to get remote address of client", ex);
+                }
+            }
         }
     }
 

@@ -128,6 +128,15 @@ public class MultisnakeServer {
     }
 
     /**
+     * Returns the {@link PacketHandler} of this server.
+     *
+     * @return the packet handler
+     */
+    public @NotNull PacketHandler getPacketHandler() {
+        return packetHandler;
+    }
+
+    /**
      * Returns the {@link ServerSocketChannel} of this server.
      *
      * @return the socket channel

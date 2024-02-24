@@ -33,7 +33,7 @@ public class PacketHandler {
      * The client packet factory is used to construct received packets.
      *
      * @param identifier the identifier of the packet
-     * @param factory the packet factory
+     * @param factory    the packet factory
      * @throws IllegalArgumentException if a client packet with the identifier is already registered
      */
     public void registerClientPacket(byte identifier, @NotNull ClientPacketFactory<?> factory) throws IllegalArgumentException {
@@ -48,7 +48,7 @@ public class PacketHandler {
      * Assigns a packet identifier to a server packet.
      *
      * @param identifier the identifier of the packet
-     * @param clazz the server packet class
+     * @param clazz      the server packet class
      */
     public void registerServerPacket(byte identifier, @NotNull Class<? extends ServerPacket> clazz) throws IllegalArgumentException {
         requireNonNull(clazz, "Server packet class cannot be null");
@@ -85,7 +85,7 @@ public class PacketHandler {
      * using the packet factory. The packet is then processed by its needs.
      *
      * @param clientChannel the sender of the packet
-     * @param buffer the packet data
+     * @param buffer        the packet data
      * @throws NetworkingException if an error occurs
      */
     public void process(@NotNull SocketChannel clientChannel, @NotNull ByteBuffer buffer) throws NetworkingException {

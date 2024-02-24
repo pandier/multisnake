@@ -34,9 +34,9 @@ public class NetworkingException extends Exception {
      * Runs a {@link Callable} and if an exception is catched, it is wrapped into a {@link NetworkingException}.
      *
      * @param callable the callable
-     * @param message the message of the {@link NetworkingException}
+     * @param message  the message of the {@link NetworkingException}
+     * @param <T>      the result type of the callable
      * @return the result of the callable
-     * @param <T> the result type of the callable
      * @throws NetworkingException if the callable throws an exception
      */
     public static <T> T wrap(@NotNull Callable<T> callable, @Nullable String message) throws NetworkingException {

@@ -11,7 +11,7 @@ public class Multisnake {
     /**
      * Creates a new multisnake instance.
      * <p>
-     * This opens a new server and binds it.
+     * This opens a new server.
      *
      * @throws Exception if an error occurs
      */

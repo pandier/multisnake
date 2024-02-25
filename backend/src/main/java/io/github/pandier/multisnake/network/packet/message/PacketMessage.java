@@ -156,7 +156,7 @@ public class PacketMessage {
      * The string is prefixed with an integer value containg
      * the amount of bytes in the encoded string.
      *
-     * @param s the string to be encoded
+     * @param s       the string to be encoded
      * @param charset the charset to be used in encoding
      */
     public void putString(@NotNull String s, @NotNull Charset charset) {

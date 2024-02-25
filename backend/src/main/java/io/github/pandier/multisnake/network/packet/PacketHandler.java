@@ -4,15 +4,14 @@ import io.github.pandier.multisnake.network.NetworkingException;
 import io.github.pandier.multisnake.network.connection.ClientConnection;
 import io.github.pandier.multisnake.network.packet.client.ClientPacket;
 import io.github.pandier.multisnake.network.packet.client.ClientPacketFactory;
+import io.github.pandier.multisnake.network.packet.message.PacketMessage;
 import io.github.pandier.multisnake.network.packet.server.ServerPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,7 +96,7 @@ public class PacketHandler {
             return;
         }
 
-        ClientPacket packet = factory.read(buffer);
+        ClientPacket packet = factory.read(new PacketMessage(buffer));
         LOGGER.debug("Received packet with identifier '{}' from client {}", identifier, clientConnection.getUuid());
     }
 
@@ -118,6 +117,6 @@ public class PacketHandler {
         if (identifier == null)
             throw new IllegalArgumentException("Server packet not registered");
         buffer.put(identifier);
-        packet.write(buffer);
+        packet.write(new PacketMessage(buffer));
     }
 }

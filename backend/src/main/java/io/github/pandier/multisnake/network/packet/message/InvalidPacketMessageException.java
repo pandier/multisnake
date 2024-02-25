@@ -4,6 +4,7 @@ package io.github.pandier.multisnake.network.packet.message;
  * An exception that occurs when a message of a packet
  * could not be decoded properly.
  */
+@SuppressWarnings("unused")
 public class InvalidPacketMessageException extends Exception {
 
     public InvalidPacketMessageException() {

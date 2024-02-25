@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 /**
  * An exception that occurs during multisnake networking operations.
  */
+@SuppressWarnings("unused")
 public class NetworkingException extends Exception {
 
     public NetworkingException() {

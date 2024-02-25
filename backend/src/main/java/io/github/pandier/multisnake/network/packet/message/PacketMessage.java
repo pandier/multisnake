@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
  * with utility methods that follow the current protocol specification,
  * and error handling for easier data reading and writing.
  */
+@SuppressWarnings("unused")
 public class PacketMessage {
     private final ByteBuffer buffer;
 

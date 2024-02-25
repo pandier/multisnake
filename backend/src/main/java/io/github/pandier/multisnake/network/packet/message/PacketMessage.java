@@ -2,6 +2,7 @@ package io.github.pandier.multisnake.network.packet.message;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -10,8 +11,8 @@ import java.nio.charset.StandardCharsets;
  * Represents a message that is sent or received as a packet.
  * <p>
  * This is a wrapper around the {@link ByteBuffer}
- * with utility methods that follow the current protocol specification
- * for easier data reading and writing.
+ * with utility methods that follow the current protocol specification,
+ * and error handling for easier data reading and writing.
  */
 public class PacketMessage {
     private final ByteBuffer buffer;
@@ -24,9 +25,14 @@ public class PacketMessage {
      * Reads a byte at the buffer position and increments the position.
      *
      * @return the byte at the current position
+     * @throws InvalidPacketMessageException if the current position is not smaller than the limit
      */
-    public byte getByte() {
-        return buffer.get();
+    public byte getByte() throws InvalidPacketMessageException {
+        try {
+            return buffer.get();
+        } catch (BufferUnderflowException e) {
+            throw new InvalidPacketMessageException("Expected byte at position " + buffer.position() + " but found end of buffer instead");
+        }
     }
 
     /**
@@ -34,9 +40,14 @@ public class PacketMessage {
      * at the current position of the buffer.
      *
      * @param dst the destination array to transfer data to
+     * @throws InvalidPacketMessageException if there aren't enough bytes remaining
      */
-    public void getBytes(byte[] dst) {
-        buffer.get(dst);
+    public void getBytes(byte[] dst) throws InvalidPacketMessageException {
+        try {
+            buffer.get(dst);
+        } catch (BufferUnderflowException e) {
+            throw new InvalidPacketMessageException("Expected byte array at position " + buffer.position() + " but found end of buffer instead");
+        }
     }
 
     /**
@@ -45,8 +56,9 @@ public class PacketMessage {
      *
      * @param length the length of the array
      * @return the constructed array
+     * @throws InvalidPacketMessageException if there aren't enough bytes remaining
      */
-    public byte[] getBytes(int length) {
+    public byte[] getBytes(int length) throws InvalidPacketMessageException {
         byte[] bytes = new byte[length];
         getBytes(bytes);
         return bytes;
@@ -57,9 +69,14 @@ public class PacketMessage {
      * The position is incremented by four.
      *
      * @return the composed integer value
+     * @throws InvalidPacketMessageException if there aren't enough bytes remaining
      */
-    public int getInt() {
-        return buffer.getInt();
+    public int getInt() throws InvalidPacketMessageException {
+        try {
+            return buffer.getInt();
+        } catch (BufferUnderflowException e) {
+            throw new InvalidPacketMessageException("Expected integer at position " + buffer.position() + " but found end of buffer instead");
+        }
     }
 
     /**
@@ -67,8 +84,9 @@ public class PacketMessage {
      * The string is prefixed with an integer indicating the size of the string.
      *
      * @return the decoded string
+     * @throws InvalidPacketMessageException if there aren't enough bytes remaining
      */
-    public @NotNull String getString() {
+    public @NotNull String getString() throws InvalidPacketMessageException {
         return getString(StandardCharsets.UTF_8);
     }
 
@@ -78,11 +96,17 @@ public class PacketMessage {
      *
      * @param charset the charset to be used to decode the bytes
      * @return the decoded string
+     * @throws InvalidPacketMessageException if there aren't enough bytes remaining
      */
-    public @NotNull String getString(@NotNull Charset charset) {
-        int length = getInt();
-        byte[] bytes = getBytes(length);
-        return new String(bytes, charset);
+    public @NotNull String getString(@NotNull Charset charset) throws InvalidPacketMessageException {
+        int previousPosition = buffer.position();
+        try {
+            int length = getInt();
+            byte[] bytes = getBytes(length);
+            return new String(bytes, charset);
+        } catch (InvalidPacketMessageException e) {
+            throw new InvalidPacketMessageException("Expected string at position " + previousPosition + " but found end of buffer instead");
+        }
     }
 
     /**

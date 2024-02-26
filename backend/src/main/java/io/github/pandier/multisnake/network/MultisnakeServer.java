@@ -3,6 +3,7 @@ package io.github.pandier.multisnake.network;
 import io.github.pandier.multisnake.network.connection.ClientConnection;
 import io.github.pandier.multisnake.network.connection.ClientConnectionHandler;
 import io.github.pandier.multisnake.network.packet.PacketHandler;
+import io.github.pandier.multisnake.network.packet.client.ClientLoginPacket;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,9 @@ public class MultisnakeServer {
         this.clientConnectionHandler = new ClientConnectionHandler(this);
 
         this.inputBuffer = ByteBuffer.allocate(256);
+
+        // Register packets
+        packetHandler.registerClientPacket((byte) 0, new ClientLoginPacket.Factory());
     }
 
     /**

@@ -11,12 +11,14 @@ public interface PacketListener {
     /**
      * A packet listener that ignores every packet it receives.
      */
-    PacketListener IGNORE = new PacketListener() {};
+    PacketListener IGNORE = new PacketListener() {
+    };
 
     /**
      * Called when the server receives a login packet.
      *
      * @param packet the login packet
      */
-    default void onLogin(@NotNull ClientLoginPacket packet) {}
+    default void onLogin(@NotNull ClientLoginPacket packet) {
+    }
 }

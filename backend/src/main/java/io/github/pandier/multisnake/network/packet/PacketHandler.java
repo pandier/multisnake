@@ -20,6 +20,9 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Handles processing and writing of packets into and from a byte buffer.
+ * <p>
+ * Multisnake packets are registered
+ * in {@link io.github.pandier.multisnake.network.MultisnakeServer MultisnakeServer} constructor.
  */
 public class PacketHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(PacketHandler.class);

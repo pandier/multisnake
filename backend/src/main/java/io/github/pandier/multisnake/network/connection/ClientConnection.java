@@ -53,6 +53,19 @@ public class ClientConnection {
     }
 
     /**
+     * Disconnects the client from the server.
+     *
+     * @throws NetworkingException if an error occurs
+     */
+    public void disconnect() throws NetworkingException {
+        try {
+            channel.close();
+        } catch (IOException e) {
+            throw new NetworkingException("Failed to close client connection", e);
+        }
+    }
+
+    /**
      * Returns the packet listener that listens to packets sent by this connection.
      *
      * @return the packet listener

@@ -6,6 +6,7 @@ import io.github.pandier.multisnake.network.packet.client.ClientPacket;
 import io.github.pandier.multisnake.network.packet.client.ClientPacketFactory;
 import io.github.pandier.multisnake.network.packet.message.InvalidPacketMessageException;
 import io.github.pandier.multisnake.network.packet.message.PacketMessage;
+import io.github.pandier.multisnake.network.packet.server.ServerErrorPacket;
 import io.github.pandier.multisnake.network.packet.server.ServerPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,6 +98,7 @@ public class PacketHandler {
         ClientPacketFactory<?> factory = getClientPacketFactory(identifier);
         if (factory == null) {
             LOGGER.info("Received invalid packet identifier '{}' from client {}", identifier, clientConnection.getUuid());
+            clientConnection.sendError(ServerErrorPacket.Error.INVALID_PACKET_IDENTIFIER);
             return;
         }
 

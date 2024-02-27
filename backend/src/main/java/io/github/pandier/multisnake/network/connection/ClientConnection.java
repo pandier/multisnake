@@ -3,6 +3,7 @@ package io.github.pandier.multisnake.network.connection;
 import io.github.pandier.multisnake.network.MultisnakeServer;
 import io.github.pandier.multisnake.network.NetworkingException;
 import io.github.pandier.multisnake.network.packet.listener.PacketListener;
+import io.github.pandier.multisnake.network.packet.server.ServerErrorPacket;
 import io.github.pandier.multisnake.network.packet.server.ServerPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +51,16 @@ public class ClientConnection {
         } catch (IOException e) {
             throw new NetworkingException("Failed to write to a socket channel", e);
         }
+    }
+
+    /**
+     * Sents a {@link ServerErrorPacket} with the given error to the client.
+     *
+     * @param error the error
+     * @throws NetworkingException if an error occurs
+     */
+    public void sendError(@NotNull ServerErrorPacket.Error error) throws NetworkingException {
+        send(new ServerErrorPacket(error));
     }
 
     /**

@@ -4,7 +4,9 @@ import io.github.pandier.multisnake.network.connection.ClientConnection;
 import io.github.pandier.multisnake.network.connection.ClientConnectionHandler;
 import io.github.pandier.multisnake.network.packet.PacketHandler;
 import io.github.pandier.multisnake.network.packet.client.ClientLoginPacket;
+import io.github.pandier.multisnake.network.packet.listener.LoginPacketListener;
 import io.github.pandier.multisnake.network.packet.server.ServerErrorPacket;
+import io.github.pandier.multisnake.network.packet.server.ServerLoginSuccessPacket;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,7 @@ public class MultisnakeServer {
 
         // Register server packets
         packetHandler.registerServerPacket((byte) 0, ServerErrorPacket.class);
+        packetHandler.registerServerPacket((byte) 1, ServerLoginSuccessPacket.class);
     }
 
     /**
@@ -121,6 +124,7 @@ public class MultisnakeServer {
                     clientChannel.register(selector, SelectionKey.OP_READ);
 
                     ClientConnection clientConnection = clientConnectionHandler.create(clientChannel);
+                    clientConnection.setPacketListener(new LoginPacketListener(clientConnection));
 
                     LOGGER.info("Accepted new connection from {} as {}", clientChannel.getRemoteAddress(), clientConnection.getUuid());
                 } catch (IOException e) {

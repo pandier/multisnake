@@ -65,14 +65,12 @@ public class ClientConnection {
 
     /**
      * Disconnects the client from the server.
-     *
-     * @throws NetworkingException if an error occurs
      */
-    public void disconnect() throws NetworkingException {
+    public void disconnect() {
         try {
             channel.close();
         } catch (IOException e) {
-            throw new NetworkingException("Failed to close client connection", e);
+            throw new RuntimeException("Failed to close client connection", e);
         }
     }
 

@@ -2,8 +2,10 @@ package io.github.pandier.multisnake.network.connection;
 
 import io.github.pandier.multisnake.network.MultisnakeServer;
 import io.github.pandier.multisnake.network.NetworkingException;
+import io.github.pandier.multisnake.network.packet.listener.PacketListener;
 import io.github.pandier.multisnake.network.packet.server.ServerPacket;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,12 +22,16 @@ public class ClientConnection {
 
     private final ByteBuffer outputBuffer;
 
+    private PacketListener packetListener;
+
     public ClientConnection(@NotNull MultisnakeServer server, @NotNull SocketChannel channel, @NotNull UUID uuid) {
         this.server = server;
         this.channel = channel;
         this.uuid = uuid;
 
         this.outputBuffer = ByteBuffer.allocate(256);
+
+        this.packetListener = PacketListener.IGNORE;
     }
 
     /**
@@ -44,6 +50,24 @@ public class ClientConnection {
         } catch (IOException e) {
             throw new NetworkingException("Failed to write to a socket channel", e);
         }
+    }
+
+    /**
+     * Returns the packet listener that listens to packets sent by this connection.
+     *
+     * @return the packet listener
+     */
+    public @NotNull PacketListener getPacketListener() {
+        return packetListener;
+    }
+
+    /**
+     * Changes the packet listener that listens to packets sent by this connection.
+     *
+     * @param packetListener the packet listener, {@link PacketListener#IGNORE} is used when null
+     */
+    public void setPacketListener(@Nullable PacketListener packetListener) {
+        this.packetListener = packetListener != null ? packetListener : PacketListener.IGNORE;
     }
 
     /**

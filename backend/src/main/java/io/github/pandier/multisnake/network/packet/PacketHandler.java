@@ -4,7 +4,6 @@ import io.github.pandier.multisnake.network.NetworkingException;
 import io.github.pandier.multisnake.network.connection.ClientConnection;
 import io.github.pandier.multisnake.network.packet.client.ClientPacket;
 import io.github.pandier.multisnake.network.packet.client.ClientPacketFactory;
-import io.github.pandier.multisnake.network.packet.listener.PacketListener;
 import io.github.pandier.multisnake.network.packet.message.InvalidPacketMessageException;
 import io.github.pandier.multisnake.network.packet.message.PacketMessage;
 import io.github.pandier.multisnake.network.packet.server.ServerPacket;
@@ -100,7 +99,7 @@ public class PacketHandler {
 
         try {
             ClientPacket packet = factory.read(new PacketMessage(buffer));
-            packet.apply(PacketListener.IGNORE);
+            packet.apply(clientConnection.getPacketListener());
             LOGGER.debug("Received packet with identifier '{}' from client {}", identifier, clientConnection.getUuid());
         } catch (InvalidPacketMessageException e) {
             LOGGER.info("Invalid packet message with identifier '{}' from client {} ({})", identifier, clientConnection.getUuid(), e.getMessage());

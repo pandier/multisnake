@@ -84,10 +84,10 @@ public class PacketHandler {
     /**
      * Processes a packet stored in a byte buffer.
      * <p>
-     * A {@link ClientPacketFactory} is chosen using a client packet registry
-     * defined in this packet handler. If the factory could not be chosen,
-     * the packet is ignored. Then a {@link ClientPacket} is constructed
-     * using the packet factory. The packet is then processed by its needs.
+     * A {@link ClientPacketFactory} is chosen using a client packet registry defined in this packet handler.
+     * If the factory could not be chosen,
+     * an {@link ServerErrorPacket.Error#INVALID_PACKET_IDENTIFIER INVALID_PACKET_IDENTIFIER} error is sent.
+     * Then a {@link ClientPacket} is constructed using the packet factory and processed by its needs.
      *
      * @param clientConnection the sender of the packet
      * @param buffer           the packet data

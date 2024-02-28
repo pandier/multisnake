@@ -1,5 +1,6 @@
 package io.github.pandier.multisnake.network;
 
+import io.github.pandier.multisnake.Multisnake;
 import io.github.pandier.multisnake.network.connection.ClientConnection;
 import io.github.pandier.multisnake.network.connection.ClientConnectionHandler;
 import io.github.pandier.multisnake.network.packet.PacketHandler;
@@ -29,6 +30,8 @@ import static java.util.Objects.requireNonNull;
 public class MultisnakeServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MultisnakeServer.class);
 
+    private final Multisnake multisnake;
+
     private final ServerSocketChannel channel;
     private final Selector selector;
 
@@ -37,7 +40,9 @@ public class MultisnakeServer {
 
     private final ByteBuffer inputBuffer;
 
-    private MultisnakeServer(ServerSocketChannel channel, Selector selector) {
+    private MultisnakeServer(Multisnake multisnake, ServerSocketChannel channel, Selector selector) {
+        this.multisnake = multisnake;
+
         this.channel = channel;
         this.selector = selector;
 
@@ -57,13 +62,14 @@ public class MultisnakeServer {
     /**
      * Opens a server-socket channel and a selector for a multisnake server.
      *
+     * @param multisnake the {@link Multisnake} instance managing this server
      * @return the multisnake server
      */
-    public static @NotNull MultisnakeServer open() throws NetworkingException {
+    public static @NotNull MultisnakeServer open(@NotNull Multisnake multisnake) throws NetworkingException {
         ServerSocketChannel socket = NetworkingException.wrap(ServerSocketChannel::open, "Failed to open server socket channel");
         Selector selector = NetworkingException.wrap(Selector::open, "Failed to open selector");
 
-        return new MultisnakeServer(socket, selector);
+        return new MultisnakeServer(multisnake, socket, selector);
     }
 
     /**
@@ -124,7 +130,7 @@ public class MultisnakeServer {
                     clientChannel.register(selector, SelectionKey.OP_READ);
 
                     ClientConnection clientConnection = clientConnectionHandler.create(clientChannel);
-                    clientConnection.setPacketListener(new LoginPacketListener(clientConnection));
+                    clientConnection.setPacketListener(new LoginPacketListener(multisnake, clientConnection));
 
                     LOGGER.info("Accepted new connection from {} as {}", clientChannel.getRemoteAddress(), clientConnection.getUuid());
                 } catch (IOException e) {

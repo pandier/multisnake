@@ -27,7 +27,12 @@ public record ServerErrorPacket(
         /**
          * Caused when the client sents an invalid packet identifier.
          */
-        INVALID_PACKET_IDENTIFIER((byte) 0x00);
+        INVALID_PACKET_IDENTIFIER((byte) 0x00),
+
+        /**
+         * Caused when the client tries to log in with a username that is already connected.
+         */
+        USERNAME_TAKEN((byte) 0x01);
 
         private final byte code;
 

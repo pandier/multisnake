@@ -54,7 +54,7 @@ public class LoginPacketListener implements PacketListener {
             return;
         }
 
-        // TODO: Change packet listener
+        connection.setPacketListener(new PlayerPacketListener(multisnake, player));
 
         try {
             connection.send(new ServerLoginSuccessPacket());

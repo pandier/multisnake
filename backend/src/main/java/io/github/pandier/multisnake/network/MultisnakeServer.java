@@ -164,6 +164,7 @@ public class MultisnakeServer {
                     if (i == 0) {
                         return;
                     } else if (i < 0) {
+                        clientConnection.getPacketListener().handleDisconnect();
                         clientConnectionHandler.remove(clientChannel);
                         clientChannel.close();
                         key.cancel();

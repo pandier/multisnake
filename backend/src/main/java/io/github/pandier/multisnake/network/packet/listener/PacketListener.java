@@ -21,4 +21,10 @@ public interface PacketListener {
      */
     default void onLogin(@NotNull ClientLoginPacket packet) {
     }
+
+    /**
+     * Called when a client disconnects from the server.
+     */
+    default void handleDisconnect() {
+    }
 }

@@ -6,6 +6,7 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 /**
  * Represents a message that is sent or received as a packet.
@@ -81,6 +82,21 @@ public class PacketMessage {
     }
 
     /**
+     * Reads the next eight bytes, composing a long value out of them.
+     * The position is incremented by eight.
+     *
+     * @return the composed long value
+     * @throws InvalidPacketMessageException if there aren't enough bytes remaining
+     */
+    public long getLong() throws InvalidPacketMessageException {
+        try {
+            return buffer.getLong();
+        } catch (BufferUnderflowException e) {
+            throw new InvalidPacketMessageException("Expected long at position " + buffer.position() + " but found end of buffer instead");
+        }
+    }
+
+    /**
      * Reads a string at the current position of the buffer using a UTF-8 charset.
      * The string is prefixed with an integer indicating the size of the string.
      *
@@ -107,6 +123,26 @@ public class PacketMessage {
             return new String(bytes, charset);
         } catch (InvalidPacketMessageException e) {
             throw new InvalidPacketMessageException("Expected string at position " + previousPosition + " but found end of buffer instead");
+        }
+    }
+
+    /**
+     * Reads the next eight bytes as most significant bits
+     * and another eight bytes as least significant bits.
+     * A unique identifier value is constructed out of them.
+     * The position is incremented by sixteen.
+     *
+     * @return the constructed unique identifier
+     * @throws InvalidPacketMessageException if there aren't enough bits
+     */
+    public @NotNull UUID getUuid() throws InvalidPacketMessageException {
+        int previousPosition = buffer.position();
+        try {
+            long mostSigBits = getLong();
+            long leastSigBits = getLong();
+            return new UUID(mostSigBits, leastSigBits);
+        } catch (InvalidPacketMessageException e) {
+            throw new InvalidPacketMessageException("Expected uuid at position " + previousPosition + " but found end of buffer instead");
         }
     }
 
@@ -140,6 +176,16 @@ public class PacketMessage {
     }
 
     /**
+     * Writes eight bytes containing the given long value into the buffer
+     * at the current position and increments the position by eight.
+     *
+     * @param l the long value
+     */
+    public void putLong(long l) {
+        buffer.putLong(l);
+    }
+
+    /**
      * Encodes and writes the given string with a UTF-8 charset
      * into the buffer at the current position.
      * The string is prefixed with an integer value containg
@@ -164,6 +210,17 @@ public class PacketMessage {
         byte[] bytes = s.getBytes(charset);
         putInt(bytes.length);
         putBytes(bytes);
+    }
+
+    /**
+     * Writes eight bytes as the most significant bits of the given unique identifier
+     * and another eight bytes as the least significant bits.
+     *
+     * @param uuid the unique identifier
+     */
+    public void putUuid(@NotNull UUID uuid) {
+        putLong(uuid.getMostSignificantBits());
+        putLong(uuid.getLeastSignificantBits());
     }
 
     /**

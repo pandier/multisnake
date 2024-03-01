@@ -3,6 +3,8 @@ package io.github.pandier.multisnake.player;
 import io.github.pandier.multisnake.network.connection.ClientConnection;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 /**
  * Represents a player that has passed the login process
  * and can participate in the game.
@@ -15,6 +17,15 @@ public class Player {
     public Player(@NotNull ClientConnection connection, @NotNull String username) {
         this.connection = connection;
         this.username = username;
+    }
+
+    /**
+     * Returns the unique identifier of this player.
+     *
+     * @return the uuid of player
+     */
+    public @NotNull UUID getUuid() {
+        return getConnection().getUuid();
     }
 
     /**

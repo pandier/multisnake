@@ -67,6 +67,17 @@ public class PacketMessage {
     }
 
     /**
+     * Reads the next byte and returns true if the byte is 0x01.
+     * The position is incremented by one.
+     *
+     * @return a boolean value
+     * @throws InvalidPacketMessageException if there aren't enough bytes remaining
+     */
+    public boolean getBoolean() throws InvalidPacketMessageException {
+        return getByte() == 1;
+    }
+
+    /**
      * Reads the next four bytes, composing an integer value out of them.
      * The position is incremented by four.
      *
@@ -163,6 +174,16 @@ public class PacketMessage {
      */
     public void putBytes(byte[] src) {
         buffer.put(src);
+    }
+
+    /**
+     * Writes 0x01 if the boolean is true, otherwise writes 0x00.
+     * The position is incremented by one.
+     *
+     * @param b the boolean value
+     */
+    public void putBoolean(boolean b) {
+        putByte(b ? (byte) 0x01 : 0x00);
     }
 
     /**

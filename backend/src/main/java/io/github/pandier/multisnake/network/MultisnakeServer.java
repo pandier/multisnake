@@ -8,6 +8,7 @@ import io.github.pandier.multisnake.network.packet.client.ClientLoginPacket;
 import io.github.pandier.multisnake.network.packet.client.ClientReadyPacket;
 import io.github.pandier.multisnake.network.packet.listener.LoginPacketListener;
 import io.github.pandier.multisnake.network.packet.server.ServerErrorPacket;
+import io.github.pandier.multisnake.network.packet.server.ServerGameStartPacket;
 import io.github.pandier.multisnake.network.packet.server.ServerLoginSuccessPacket;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -59,6 +60,7 @@ public class MultisnakeServer {
         // Register server packets
         packetHandler.registerServerPacket((byte) 0, ServerErrorPacket.class);
         packetHandler.registerServerPacket((byte) 1, ServerLoginSuccessPacket.class);
+        packetHandler.registerServerPacket((byte) 2, ServerGameStartPacket.class);
     }
 
     /**

@@ -5,6 +5,7 @@ import io.github.pandier.multisnake.network.connection.ClientConnection;
 import io.github.pandier.multisnake.network.connection.ClientConnectionHandler;
 import io.github.pandier.multisnake.network.packet.PacketHandler;
 import io.github.pandier.multisnake.network.packet.client.ClientLoginPacket;
+import io.github.pandier.multisnake.network.packet.client.ClientReadyPacket;
 import io.github.pandier.multisnake.network.packet.listener.LoginPacketListener;
 import io.github.pandier.multisnake.network.packet.server.ServerErrorPacket;
 import io.github.pandier.multisnake.network.packet.server.ServerLoginSuccessPacket;
@@ -53,6 +54,7 @@ public class MultisnakeServer {
 
         // Register client packets
         packetHandler.registerClientPacket((byte) 0, new ClientLoginPacket.Factory());
+        packetHandler.registerClientPacket((byte) 1, new ClientReadyPacket.Factory());
 
         // Register server packets
         packetHandler.registerServerPacket((byte) 0, ServerErrorPacket.class);

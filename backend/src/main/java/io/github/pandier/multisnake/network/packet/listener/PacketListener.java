@@ -1,6 +1,7 @@
 package io.github.pandier.multisnake.network.packet.listener;
 
 import io.github.pandier.multisnake.network.packet.client.ClientLoginPacket;
+import io.github.pandier.multisnake.network.packet.client.ClientReadyPacket;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,6 +21,14 @@ public interface PacketListener {
      * @param packet the login packet
      */
     default void onLogin(@NotNull ClientLoginPacket packet) {
+    }
+
+    /**
+     * Called when the server receives a ready packet.
+     *
+     * @param packet the ready packet
+     */
+    default void onReady(ClientReadyPacket packet) {
     }
 
     /**

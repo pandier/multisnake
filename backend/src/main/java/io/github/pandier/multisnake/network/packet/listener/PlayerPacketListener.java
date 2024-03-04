@@ -21,6 +21,7 @@ public class PlayerPacketListener implements PacketListener {
     @Override
     public void onReady(@NotNull ClientReadyPacket packet) {
         player.setReady(packet.ready());
+        multisnake.startGame(false);
     }
 
     @Override

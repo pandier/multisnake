@@ -5,6 +5,9 @@ import io.github.pandier.multisnake.network.packet.client.ClientReadyPacket;
 import io.github.pandier.multisnake.player.Player;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Handles packets of a player.
+ */
 public class PlayerPacketListener implements PacketListener {
 
     private final Multisnake multisnake;

@@ -28,7 +28,7 @@ public interface PacketListener {
      *
      * @param packet the ready packet
      */
-    default void onReady(ClientReadyPacket packet) {
+    default void onReady(@NotNull ClientReadyPacket packet) {
     }
 
     /**

@@ -14,9 +14,29 @@ public class Player {
     private final ClientConnection connection;
     private final String username;
 
+    private boolean ready = false;
+
     public Player(@NotNull ClientConnection connection, @NotNull String username) {
         this.connection = connection;
         this.username = username;
+    }
+
+    /**
+     * Changes the ready status to the given boolean value.
+     *
+     * @param ready the ready status
+     */
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    /**
+     * Returns true if the player is ready.
+     *
+     * @return the player's ready status
+     */
+    public boolean isReady() {
+        return ready;
     }
 
     /**

@@ -56,6 +56,8 @@ public class LoginPacketListener implements PacketListener {
 
         connection.setPacketListener(new PlayerPacketListener(multisnake, player));
 
+        LOGGER.info("Authenticated '{}' as {}", player.getUsername(), connection.getUuid());
+
         try {
             connection.send(new ServerLoginSuccessPacket());
         } catch (NetworkingException e) {
